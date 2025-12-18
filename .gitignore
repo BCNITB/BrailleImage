@@ -1,0 +1,15 @@
+# Pycache
+__pycache__/
+*.pyc
+
+# Build artifacts
+build/
+dist/
+*.spec
+*.pkg
+*.exe
+*.log
+BrailleConverter.spec
+
+# Windows executable
+windows/
