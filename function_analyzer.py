@@ -607,9 +607,12 @@ def analyze_composite_function(function_domain_pairs):
         'function_type': 'composite',
         'pieces_analysis': [],
         'connection_points_analysis': [],
-        'summary_text': ""
+        'summary_text': "",
+        'y_intercept': None
     }
     summary_parts = ["Análisis de la Función Compuesta", "-------------------------------------------------"]
+
+    y_intercept_found = False
 
     # Analyze each piece
     for i, (f_expr, domain_info) in enumerate(function_domain_pairs):
@@ -626,6 +629,7 @@ def analyze_composite_function(function_domain_pairs):
             'domain_interval': str(domain_interval),
             'continuity_in_piece': "",
             'roots': _get_roots(f, x),
+            'y_intercept': None,
             'extrema': {"local": [], "absolute": []},
             'inflection_points': [],
             'concavity': {"concave_intervals": [], "convex_intervals": []},
@@ -635,6 +639,14 @@ def analyze_composite_function(function_domain_pairs):
         summary_parts.append(f"\nAnálisis del Tramo {i+1}: y = {f} en {domain_interval}")
         summary_parts.append("-------------------------------------------------")
         summary_parts.append(f"Dominio del tramo: {domain_interval}")
+
+        # Y-intercept
+        if not y_intercept_found and 0 in domain_interval:
+            y_intercept_val = f.subs(x, 0)
+            piece_analysis['y_intercept'] = y_intercept_val
+            composite_analysis['y_intercept'] = y_intercept_val
+            summary_parts.append(f"Punto de corte con el eje Y: y = {_format_sympy_object(y_intercept_val)}")
+            y_intercept_found = True
 
         # Continuity within the interval
         discontinuities = sp.singularities(f, x, domain_interval)
@@ -733,6 +745,9 @@ def analyze_composite_function(function_domain_pairs):
             summary_parts.append(f"No se pudo analizar la continuidad en x = {connection_point_val}: {e}")
         
         composite_analysis['connection_points_analysis'].append(connection_point_analysis)
+
+    if not y_intercept_found:
+        summary_parts.insert(2, "Punto de corte con el eje Y: No cruza el eje Y.")
 
     composite_analysis['summary_text'] = "\n".join(summary_parts)
     return composite_analysis
